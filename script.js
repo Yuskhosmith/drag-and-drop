@@ -44,7 +44,7 @@ function updateSavedColumns() {
   listArrays = [backlogListArray, progressListArray, completeListArray, onHoldListArray];
   const arrayNames = ['backlog', 'progress', 'complete', 'onHold'];
   arrayNames.forEach((arrayName, index) => {
-    localStorage.setItem(`${arrayName}`, JSON.stringify(listArrays[index]));
+    localStorage.setItem(`${arrayName}Items`, JSON.stringify(listArrays[index]));
   });
 }
 
@@ -67,7 +67,6 @@ function createItemEl(columnEl, column, item, index) {
   listEl.setAttribute('onfocusout', `updateItem(${index}, ${column})`);
   // Append
   columnEl.appendChild(listEl);
-
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
@@ -103,18 +102,17 @@ function updateDOM() {
   // Run getSavedColumns only once, Update Local Storage
   updatedOnLoad = true;
   updateSavedColumns();
-
 }
 
 // Update Item - Delete if necessary
 function updateItem(id, column) {
   const selectedArray = listArrays[column];
-  const selectedColumnEl = listColumns[column].children;
+  const selectedColumn = listColumns[column].children;
   if (!dragging) {
-    if (!selectedColumnEl[id].textContent) {
+    if (!selectedColumn[id].textContent) {
       delete selectedArray[id];
     } else {
-      selectedArray[id] = selectedColumnEl[id].textContent;
+      selectedArray[id] = selectedColumn[id].textContent;
     }
     updateDOM();
   }
@@ -126,7 +124,7 @@ function addToColumn(column) {
   const selectedArray = listArrays[column];
   selectedArray.push(itemText);
   addItems[column].textContent = '';
-  updateDOM();
+  updateDOM(column);
 }
 
 // Show Add Item Input Box
@@ -169,7 +167,6 @@ function rebuildArrays() {
 function drag(e) {
   draggedItem = e.target;
   dragging = true;
-  
 }
 
 // Column Allows for Item to drop
@@ -200,4 +197,3 @@ function drop(e) {
 
 // On Load
 updateDOM();
-
